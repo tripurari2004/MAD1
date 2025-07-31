@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--title-->
+    <title>Home Service | Customer</title>
+    <!--css-->
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+    <!--favicon-->
+    <link rel="shortcut icon" href="{{url_for('static', filename='img/banner.jpg')}}" type="image/x-icon">
+    <!--bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+    <!--wrapper-->
+    <div class="wrapper">
+
+        <!--navbar-->
+        <nav class="navbar navbar-expand-lg bg-dark-subtle position-fixed z-3">
+            <div class="container-fluid ms-5">
+
+                <!--banner-->
+                <a class="navbar-brand" href="#"><img src="../static/img/banner.jpg" alt="logo"
+                        class="img-thumbnail banner margin-customer me-5"></a>
+
+                <!--nav items-->
+                <div class=" navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!--home-->
+                        <li class="nav-item ms-5 me-5 login ">
+                            <a class="nav-link shadow" href="#"><i class="fa-solid fa-house"></i> Home</a>
+                        </li>
+
+                        <!--summary-->
+                        <li class="nav-item ms-5 me-5 login">
+                            <a class="nav-link shadow" href="/customer_summary"><i class="fa-solid fa-chart-simple"></i>
+                                Summary</a>
+                        </li>
+
+                        <!--profile-->
+                        <li class="nav-item ms-5 me-5 login">
+                            <a class="nav-link shadow" href="/profile"><i class="fa-solid fa-user"></i>
+                                Profile</a>
+                        </li>
+
+                        <!--logout-->
+                        <li class="nav-item ms-5 me-5 login">
+                            <a class="nav-link shadow" href="/logout"><i class="fa-solid fa-right-from-bracket"></i>
+                                Logout</a>
+                        </li>
+
+                        <!--search-->
+                        <form class="d-flex ms-5" role="search" action="/search_service" method="get">
+                            <input class="form-control me-2" type="search" placeholder="Search by Service Name"
+                                name="query" aria-label="Search">
+                            <button class="btn btn-outline-success w-50" type="submit"><i
+                                    class="fa-solid fa-magnifying-glass"></i> Search</button>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!--flash message-->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" role="alert" id="flash-message">
+            {{ messages[0][1] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        {% endwith %}
+        <!--flash message script-->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let flashMessage = document.querySelector('#flash-message');
+
+                if (flashMessage) {
+                    setTimeout(function () {
+                        flashMessage.classList.remove('show');
+                        flashMessage.classList.add('fade');
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 0);
+                    }, 2000);
+                }
+            });
+        </script>
+
+        <!--main content-->
+        <div class="mt-5 ms-5 me-5 p-5 z-1">
+
+            <!--cards-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if services%}
+
+                <!--heading-->
+                <h2 class="text-center fw-bold text-decoration-underline">Available Services</h2>
+
+                <!--card-->
+                <div class="d-flex flex-wrap justify-content-center p-5">
+                    {%for key, value in services.items()%}
+                    <div class="services-card me-5" style="text-align: center;">
+
+                        <!--service title-->
+                        <h3 class="card-title">{{value.service_name}}</h3>
+
+                        <!--service price-->
+                        <h3 class="mt-4">₹ {{value.price}}</h3>
+
+                        <!--btn-->
+                        <button class="card-btn mt-3" data-bs-toggle="modal"
+                            data-bs-target="#aboutServiceModal{{key}}">See More <i class="fa-solid fa-eye"></i></button>
+                    </div>
+
+                    <!--see More Modal-->
+                    <form id="aboutServiceForm{{key}}" method="POST" action="{{url_for('book_service')}}">
+                        <input type="hidden" name="service_name" value="{{value.service_name}}">
+                        <div class="modal fade" id="aboutServiceModal{{key}}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="aboutServiceModalLabel{{key}}">Details about
+                                            {{value.service_name}}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h6><span class="text-info fw-bold">Price:- </span>₹ {{value.price}}</h6>
+                                        <h6 class="mt-3"><span class="text-info fw-bold">Description:-
+                                            </span>{{value.description}}</h6>
+                                        <div class="table">
+                                            {% if value.professionals %}
+                                            <h6 class="fw-bold text-info mt-3">Professionals</h6>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr class="table-secondary" style="text-align: center;">
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Experience</th>
+                                                        <th scope="col">Document</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for professional in value.professionals %}
+                                                    <tr style="text-align: center;">
+                                                        <th>{{professional.name}}</th>
+                                                        <th>{{professional.experience}}yrs</th>
+                                                        <th>
+                                                            {% if professional.document %}
+                                                            <a href="{{ url_for('static', filename=professional.document) }}"
+                                                                target="_blank"
+                                                                class="btn btn-link text-decoration-none bg-info-subtle text-dark fw-bold">View
+                                                                Document</a>
+                                                            {% else %}
+                                                            <span class="text-danger">No Document</span>
+                                                            {% endif %}
+                                                        </th>
+                                                    </tr>
+                                                    {%endfor%}
+                                                </tbody>
+                                            </table>
+                                            {%else%}
+                                            <p class="text-danger">No professionals available for this service.</p>
+                                            {%endif%}
+
+                                            <div class="mb-3">
+                                                <label for="professional_name" class="form-label fw-bold text-info">
+                                                    Select Professional of your choice</label>
+                                                <select name="professional_id" id="professional_name"
+                                                    class="form-select" required>
+                                                    {% for professional in value.professionals %}
+                                                    <option value="{{professional.id}}">{{professional.name}}</option>
+                                                    {%endfor%}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Book</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    {%endfor%}
+                </div>
+                {%else%}
+                <h4>No Services available...</h4>
+                {%endif%}
+            </div>
+
+            <!--pending service-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if requests%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Pending Service</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Professional Name</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        {% if request.status == 0 %}
+                        <tr style="text-align: center;">
+                            <th>{{request.service_name}}</th>
+                            <th>{{request.professional_name}}</th>
+                            <th>{{request.mobile_number}}</th>
+                            <th>
+                                <span class="badge bg-warning">Pending</span>
+
+                            </th>
+                            <th><button type="button" class="btn btn-danger"
+                                    onclick="cancelService('{{request.id}}')"><i class="fa-solid fa-circle-xmark"></i>
+                                    Cancel</button></th>
+
+                        </tr>
+                        {%endif%}
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="text-danger">No Service history available...</h4>
+                {%endif%}
+            </div>
+            <script>
+                function cancelService(id) {
+                    fetch(`/cancel_service/${id}`, { method: "POST" })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message)
+                            location.reload()
+                        })
+                }
+            </script>
+
+
+            <!--accepted service-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if requests%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Accepted Service</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Professional Name</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        {% if request.status == 1 %}
+                        <tr style="text-align: center;">
+                            <th>{{request.service_name}}</th>
+                            <th>{{request.professional_name}}</th>
+                            <th>{{request.mobile_number}}</th>
+                            <th>
+                                <span class="badge bg-success">Accepted</span>
+
+                            </th>
+
+                        </tr>
+                        {%endif%}
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="text-danger">No Service history available...</h4>
+                {%endif%}
+            </div>
+
+
+            <!--completed service-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if requests%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Completed Service</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Professional Name</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Date of completition</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Rating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        {% if request.status == 2 %}
+                        <tr style="text-align: center;">
+                            <th>{{request.service_name}}</th>
+                            <th>{{request.professional_name}}</th>
+                            <th>{{request.mobile_number}}</th>
+                            <th>{{request.date_of_completition}}</th>
+                            <th>
+                                <span class="badge bg-primary">Completed</span>
+
+                            </th>
+                            <th>
+                                {%if request.rating %}
+                                <span>
+                                    {%for _ in range(request.rating) %}
+                                    <i class="fa-solid fa-star text-warning"></i>
+                                    {%endfor%}
+                                </span>
+                                {%else%}
+                                <button type="button" class="btn btn-primary rating-btn" data-bs-toggle="modal"
+                                    data-bs-target="#ratingModal" data-request-id="{{request.id}}">
+                                    <i class="fa-solid fa-star"></i> Review
+                                </button>
+                                {%endif%}
+                            </th>
+
+                        </tr>
+                        {%endif%}
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="text-danger">No Service history available...</h4>
+                {%endif%}
+
+                <!--review modal-->
+                <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="ratingModalLabel">Give Your Review</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <form method="POST" action="/service_rating">
+                                <div class="modal-body">
+                                    <input type="hidden" name="request_id" id="requestIdInput">
+                                    <label for="rating" class="form-label fw-bold">Rating: </label>
+                                    <select name="rating" id="rating" class="form-select">
+                                        <option value="" disabled selected>Select stars for rating</option>
+                                        <option value="1">⭐</option>
+                                        <option value="2">⭐⭐</option>
+                                        <option value="3">⭐⭐⭐</option>
+                                        <option value="4">⭐⭐⭐⭐</option>
+                                        <option value="5">⭐⭐⭐⭐⭐</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const ratingbtn = document.querySelectorAll(".rating-btn");
+                    const requestIdInput = document.querySelector("#requestIdInput");
+
+                    ratingbtn.forEach((button) => {
+                        button.addEventListener("click", function () {
+                            const requestId = this.getAttribute("data-request-id");
+                            requestIdInput.value = requestId;
+                        })
+                    })
+                })
+            </script>
+
+
+
+            <!--rejected service-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if requests%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Rejected Service</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Professional Name</th>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        {% if request.status == 3 %}
+                        <tr style="text-align: center;">
+                            <th>{{request.service_name}}</th>
+                            <th>{{request.professional_name}}</th>
+                            <th>{{request.mobile_number}}</th>
+                            <th>
+                                <span class="badge bg-danger">Rejected</span>
+
+                            </th>
+                        </tr>
+                        {%endif%}
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="text-danger">No Service history available...</h4>
+                {%endif%}
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!--bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

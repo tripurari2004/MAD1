@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--title-->
+    <title>Home Service | Admin</title>
+    <!--css-->
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}">
+    <!--favicon-->
+    <link rel="shortcut icon" href="{{url_for('static', filename='img/banner.jpg')}}" type="image/x-icon">
+    <!--bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+</head>
+
+<body>
+
+    <!--wrapper-->
+    <div class="wrapper">
+
+        <!--navbar-->
+        <nav class="navbar navbar-expand-lg bg-dark-subtle position-fixed">
+            <div class="container-fluid d-flex justify-content-center ms-5">
+
+                <!--banner-->
+                <a class="navbar-brand" href="#"><img src="{{url_for('static', filename='img/banner.jpg')}}" alt="logo"
+                        class="img-thumbnail banner margin me-5"></a>
+
+                <!--nav items-->
+                <div class=" navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                        <!--home-->
+                        <li class="nav-item ms-5 me-5 login ">
+                            <a class="nav-link shadow " href="#"><i class="fa-solid fa-house"></i> Home</a>
+                        </li>
+
+                        <!--summary-->
+                        <li class="nav-item ms-5 me-5 login">
+                            <a class="nav-link shadow" href="/admin_summary"><i class="fa-solid fa-chart-simple"></i>
+                                Summary</a>
+                        </li>
+
+                        <!--logout-->
+                        <li class="nav-item ms-5 me-5 login">
+                            <a class="nav-link shadow" href="/logout"><i class="fa-solid fa-right-from-bracket"></i>
+                                Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </nav>
+
+        <!--flash message-->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" role="alert" id="flash-message">
+            {{ messages[0][1] }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+        {% endwith %}
+        <!--flash message script-->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let flashMessage = document.querySelector('#flash-message');
+
+                if (flashMessage) {
+                    setTimeout(function () {
+                        flashMessage.classList.remove('show');
+                        flashMessage.classList.add('fade');
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 0);
+                    }, 2000);
+                }
+            });
+        </script>
+
+        <!--main content-->
+        <div class="mt-5 ms-5 me-5 p-5">
+
+            <!--new services btn-->
+            <div class="mt-5 mb-5">
+                <!-- button trigger modal -->
+                <button type="button" class="btn btn-primary fw-bold" data-bs-toggle="modal"
+                    data-bs-target="#newServiceModal">New Service <i class="fa-solid fa-plus"></i>
+                </button>
+
+                <!-- add Service Modal -->
+                <form action="/service/add" method="POST" id="newServiceForm">
+                    <div class="modal fade" id="newServiceModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="newServiceModalLabel">New Service</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <!--servicename-->
+                                    <div class="mb-3">
+                                        <label for="service" class="form-label fw-bold"><i
+                                                class="fa-brands fa-servicestack"></i>
+                                            Service Name <span class="text-danger">* </span></label>
+                                        <select name="service" id="service" class="form-select" required>
+                                            <option value="Electrician">Electrician</option>
+                                            <option value="Carpenter">Carpenter</option>
+                                            <option value="Laundary">Laundary</option>
+                                        </select>
+                                    </div>
+
+                                    <!--price-->
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label fw-bold"><i
+                                                class="fa-solid fa-circle-info"></i> Price
+                                            <span class="text-danger">* </span></label>
+                                        <input type="number" name="price" id="price" class="form-control" required>
+                                    </div>
+                                    
+                                    <!--time-->
+                                    <div class="mb-3">
+                                        <label for="time" class="form-label fw-bold"><i
+                                                class="fa-solid fa-clock"></i> Time Required (min.)
+                                            <span class="text-danger">* </span></label>
+                                        <input type="number" name="time" id="time" class="form-control" required>
+                                    </div>
+
+                                    <!--description-->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label fw-bold"><i
+                                                class="fa-solid fa-address-card"></i> Description
+                                            <span class="text-danger">* </span></label>
+                                        <textarea name="description" id="description" class="form-control"
+                                            required></textarea>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <!--edit Service Model-->
+                <form id="editServiceForm" method="POST">
+                    <div class="modal fade" id="editServiceModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+
+                                    <!--title-->
+                                    <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <!--servicename-->
+                                    <div class="mb-3">
+                                        <label for="service" class="form-label fw-bold"><i
+                                                class="fa-brands fa-servicestack"></i>
+                                            Service Name <span class="text-danger">* </span></label>
+                                        <select name="service" id="service" class="form-select" required readonly>
+                                            <option value="Electrician">Electrician</option>
+                                            <option value="Carpenter">Carpenter</option>
+                                            <option value="Laundary">Laundary</option>
+                                        </select>
+                                    </div>
+
+                                    <!--price-->
+                                    <div class="mb-3">
+                                        <label for="price" class="form-label fw-bold"><i
+                                                class="fa-solid fa-circle-info"></i> Price
+                                            <span class="text-danger">* </span></label>
+                                        <input type="number" name="price" id="price" class="form-control" required>
+                                    </div>
+                                    
+                                    <!--time-->
+                                    <div class="mb-3">
+                                        <label for="time" class="form-label fw-bold"><i
+                                                class="fa-solid fa-clock"></i> Time Required (min.)
+                                            <span class="text-danger">* </span></label>
+                                        <input type="number" name="time" id="time" class="form-control" required>
+                                    </div>
+
+                                    <!--description-->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label fw-bold"><i
+                                                class="fa-solid fa-address-card"></i> Description
+                                            <span class="text-danger">* </span></label>
+                                        <textarea name="description" id="description" class="form-control" required></textarea>
+                                    </div>
+
+                                </div>
+
+                                <!--btn-->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <script>
+                    $("#editServiceModal").on("show.bs.modal", function (event) {
+                        let button = $(event.relatedTarget);
+                        let str = button.data("val");
+                        let serviceKey = button.closest("tr").find("th:first").text();
+                        let values = str.split("#");
+                        $(this).find("#price").val(values[1]);
+                        $(this).find("#time").val(values[2]);
+                        $(this).find("#description").val(values[3]);
+
+                        $("#editServiceForm").attr("action", `/service/edit/${serviceKey}`);
+                    })
+                </script>
+
+            </div>
+
+            <!--services-->
+            <div style="border: 2px dotted black;" class="p-2 rounded-2">
+                {%if services%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mt-2">Services</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Id</th>
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Base Price</th>
+                            <th scope="col">Time Required (min.)</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for key, value in services.items()%}
+                        <tr style="text-align: center;">
+                            <th>{{key}}</th>
+                            <th>{{value.service_name}}</th>
+                            <th>{{value.price}}</th>
+                            <th>{{value.time}}</th>
+                            <th><button type="button" class="btn btn-warning fw-bold" data-bs-toggle="modal"
+                                    data-bs-target="#editServiceModal"
+                                    data-val="{{value.service_name}}#{{value.price}}#{{value.time}}#{{value.description}}">Edit
+                                    <i class="fa-solid fa-pen-to-square"></i> </button> | 
+                                    <form action="/service/delete/{{key}}" method="POST" style="display: inline;">
+                                        <button type="submit"
+                                        class="btn btn-danger fw-bold" >Delete
+                                        <i class="fa-solid fa-trash"></i></button>
+                                    </form>
+                                </th>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="mb-2 text-danger">No Service available..</h4>
+                {%endif%}
+            </div>
+
+            <!--professionals-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if professionals%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Professional</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Name</th>
+                            <th scope="col">Experiences(in yrs.)</th>
+                            <th scope="col">Service Name</th>
+                            <th scope="col">Documet</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for professional in professionals %}
+                        <tr style="text-align: center;">
+                            <th>{{professional.name}}</th>
+                            <th>{{professional.experience}}</th>
+                            <th>{{professional.service}}</th>
+                            <th>
+                                {% if professional.document %}
+                                <a href="{{ url_for('static', filename=professional.document) }}" target="_blank"
+                                    class="btn btn-link text-decoration-none bg-info-subtle text-dark fw-bold">View
+                                    Document</a>
+                                {% else %}
+                                <span class="text-danger">No Document</span>
+                                {% endif %}
+                            </th>
+                            <th>{% if professional.status == 0 %}
+                                <span class="badge bg-warning fw-bold">Inprogress</span>
+                                {%elif professional.status == 1 %}
+                                <span class="badge bg-success fw-bold">Active</span>
+                                {%else%}
+                                <span class="badge bg-danger fw-bold">Block</span>
+                                {%endif%}
+                            </th>
+                            <th>
+                                {% if professional.status == 0 %}
+                                <button type="button" class="btn btn-success fw-bold"
+                                    onclick="approveProfessional('{{professional.id}}')">Accept <i
+                                        class="fa-solid fa-circle-check"></i></button>
+                                {% elif professional.status == 1 %}
+                                <button type="button" class="btn btn-danger fw-bold"
+                                    onclick="blockProfessional('{{professional.id}}')">
+                                    Block <i class="fa-solid fa-ban"></i></button>
+                                {% elif professional.status == 2 %}
+                                <button type="button" class="btn btn-danger fw-bold" disabled>
+                                    Block <i class="fa-solid fa-ban"></i></button>
+                                {%endif%}
+                            </th>
+
+                            <script>
+                                function approveProfessional(id) {
+                                    fetch(`/approve_professional/${id}`, { method: "POST" })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            alert(data.message)
+                                            location.reload()
+                                        })
+                                }
+
+
+                                function blockProfessional(id) {
+                                    fetch(`/block_professional/${id}`, { method: "POST" })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            alert(data.message)
+                                            location.reload()
+                                        })
+                                }
+                            </script>
+
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+
+                {%else%}
+                <h4 class="text-danger">No Professionals available...</h4>
+                {%endif%}
+            </div>
+
+
+            <!--customer-->
+            <div style="border: 2px dotted black;" class="p-2 mt-5 rounded-2">
+                {%if customers%}
+
+                <!--heading-->
+                <h4 class="fw-bold text-decoration-underline mb-3">Customer</h4>
+
+                <!--table-->
+                <table class="table">
+                    <thead>
+                        <tr class="table-secondary" style="text-align: center;">
+                            <th scope="col">Name</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Pincode</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for key, value in customers.items()%}
+                        <tr style="text-align: center;">
+                            <th>{{value[0]}}</th>
+                            <th>{{value[1]}}</th>
+                            <th>{{value[2]}}</th>
+                            <th>{% if value[3]==1 %}
+                                <span class="badge bg-success fw-bold">Active</span>
+                                {%else%}
+                                <span class="badge bg-danger fw-bold">Block</span>
+                                {%endif%}
+                            </th>
+                            <th>
+                                {% if value[3]==1 %}
+                                <button type="button" class="btn btn-danger fw-bold" onclick="blockCustomer('{{key}}')">
+                                    Block <i class="fa-solid fa-ban"></i></button>
+                                {%else%}
+                                <button type="button" class="btn btn-danger fw-bold" disabled>Block <i
+                                        class="fa-solid fa-ban"></i></button>
+                                {%endif%}
+                            </th>
+
+                            <script>
+                                function blockCustomer(id) {
+                                    fetch(`/block_customer/${id}`, { method: "POST" })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            alert(data.message)
+                                            location.reload()
+                                        })
+                                }
+                            </script>
+                        </tr>
+                        {%endfor%}
+                    </tbody>
+                </table>
+                {%else%}
+                <h4 class="text-danger">No Customers available...</h4>
+                {%endif%}
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+
+
+</body>
+
+</html>
